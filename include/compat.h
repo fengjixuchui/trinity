@@ -241,6 +241,10 @@ enum {
 #define PF_SMC		43
 #endif
 
+#ifndef PF_XDP
+#define PF_XDP		44
+#endif
+
 #ifndef NFC_SOCKPROTO_RAW
 #define NFC_SOCKPROTO_RAW	0
 #endif
@@ -372,6 +376,23 @@ enum {
 #define PR_CAP_AMBIENT		47
 #endif
 
+//TODO wtf were 48,49 ?
+
+// arm64 only
+#ifndef PR_SVE_SET_VL
+#define PR_SVE_SET_VL		50 
+#define PR_SVE_GET_VL           51
+#endif
+
+#ifndef PR_GET_SPECULATION_CTRL
+#define PR_GET_SPECULATION_CTRL         52
+#define PR_SET_SPECULATION_CTRL         53
+#endif
+
+// arm64 only
+#ifndef PR_PAC_RESET_KEYS
+#define PR_PAC_RESET_KEYS               54
+#endif
 
 /* linux/rds.h */
 #ifndef RDS_CANCEL_SENT_TO
@@ -538,6 +559,29 @@ enum kcmp_type {
 #ifndef SO_ZEROCOPY
 #define SO_ZEROCOPY	60
 #endif
+
+#ifndef SO_TXTIME
+#define SO_TXTIME               61
+#endif
+#ifndef SO_BINDTOIFINDEX
+#define SO_BINDTOIFINDEX        62
+#endif
+#ifndef SO_TIMESTAMP_NEW
+#define SO_TIMESTAMP_NEW        63
+#endif
+#ifndef SO_TIMESTAMPNS_NEW
+#define SO_TIMESTAMPNS_NEW      64
+#endif
+#ifndef SO_TIMESTAMPING_NEW
+#define SO_TIMESTAMPING_NEW     65
+#endif
+#ifndef SO_RCVTIMEO_NEW
+#define SO_RCVTIMEO_NEW         66
+#endif
+#ifndef SO_SNDTIMEO_NEW
+#define SO_SNDTIMEO_NEW         67
+#endif
+
 
 
 /* linux/tcp.h */
@@ -1221,4 +1265,14 @@ struct kvm_get_htab_fd {
 #endif
 #ifndef AUTOFS_IOC_EXPIRE_DIRECT
 #define AUTOFS_IOC_EXPIRE_DIRECT AUTOFS_IOC_EXPIRE_MULTI
+#endif
+
+/* linux/mount.h */
+#ifndef MOVE_MOUNT_F_SYMLINKS
+#define MOVE_MOUNT_F_SYMLINKS           0x00000001 /* Follow symlinks on from path */
+#define MOVE_MOUNT_F_AUTOMOUNTS         0x00000002 /* Follow automounts on from path */
+#define MOVE_MOUNT_F_EMPTY_PATH         0x00000004 /* Empty from path permitted */
+#define MOVE_MOUNT_T_SYMLINKS           0x00000010 /* Follow symlinks on to path */
+#define MOVE_MOUNT_T_AUTOMOUNTS         0x00000020 /* Follow automounts on to path */
+#define MOVE_MOUNT_T_EMPTY_PATH         0x00000040 /* Empty to path permitted */
 #endif
