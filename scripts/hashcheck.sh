@@ -25,11 +25,11 @@ check()
 # Note: Commented out checks are likely out of date, but they're for architectures
 #  I don't have time to care about. Step up and contribute if you care.
 #
-check include/uapi/asm-generic/unistd.h    f15d6c6ce3fd351a88f40d7c8b2e631e25dbed8d sys_
+check include/uapi/asm-generic/unistd.h    198599d8f761b4dd63db413600419fdad3ddfcbd sys_
 #check arch/alpha/include/uapi/asm/unistd.h 51fa669a21d8f26a0c9de8280a3cfd9c257a0d28 _NR_
 #check arch/arm/include/uapi/asm/unistd.h   7c601d436a3ebbe05a9b6813c0ffcf8eedaf101b SYSCALL
-check arch/x86/entry/syscalls/syscall_32.tbl     340cb5804ab72eeaea9aed0394b4f2e891575a81 sys_
-check arch/x86/entry/syscalls/syscall_64.tbl     9aca30eead0af4397c058c829ca15b49ea3e585e sys_
+check arch/x86/entry/syscalls/syscall_32.tbl     be7686afac49943e1a89447b1d09f4a6e868f482 sys_
+check arch/x86/entry/syscalls/syscall_64.tbl     83b2c58072648e92afca0504d5a60b456ddfe2ce sys_
 check arch/x86/entry/syscalls/syscall_64.tbl     da39a3ee5e6b4b0d3255bfef95601890afd80709 stub_
 #check arch/ia64/kernel/entry.S             e6a21b973609ec08cd19b0b8c67830f8570e93ef "data8\ sys_"
 #check arch/mips/kernel/scall32-o32.S       b1501a675dd998fe2af68ae43cd797cf18d67b33 sys_
@@ -40,8 +40,8 @@ check arch/x86/entry/syscalls/syscall_64.tbl     da39a3ee5e6b4b0d3255bfef9560189
 #check arch/sparc/kernel/systbls_32.S       98100f9dedc82d82ac18a33fd68dc7e4852ffcb8 sys_
 
 # new setsockopt values
-check include/uapi/asm-generic/socket.h	9df70d0b2c11b5df9a2f9b3aa835d49511a0ec36 SO_
-check include/uapi/linux/tcp.h          8ea7461203395459db4a7ceaeea1f18893f74cec \#define\ TCP_
+check include/uapi/asm-generic/socket.h	08003e14cf68ce62a2caeb8921db3e081a612f09 SO_
+check include/uapi/linux/tcp.h          149a6ee4bb5bb81fd8d44923c5846f85b7130d5e \#define\ TCP_
 check include/uapi/linux/in.h           0116e6878df350e74ec730fd9f455efb95e510c8 \#define\ IP_
 
 # Check for new packet families
