@@ -22,7 +22,6 @@
 #include "tables.h"
 #include "taint.h"
 #include "trinity.h"
-#include "udp.h"
 
 static void handle_child(int childno, pid_t childpid, int childstatus);
 
@@ -300,9 +299,6 @@ static void stuck_syscall_info(struct childdata *child)
 	if (shm->debug == FALSE)
 		return;
 
-	if (child->type != CHILD_RAND_SYSCALL)
-		return;
-
 	rec = &child->syscall;
 
 	if (trylock(&rec->lock) == FALSE)
@@ -403,8 +399,8 @@ static bool is_child_making_progress(struct childdata *child)
 	if (diff < 40)
 		return FALSE;
 
-	debugf("sending another SIGKILL to child %u (pid:%u type:%u). [kill count:%u] [diff:%lu]\n",
-		child->num, pid, child->type, child->kill_count, diff);
+	debugf("sending another SIGKILL to child %u (pid:%u). [kill count:%u] [diff:%lu]\n",
+		child->num, pid, child->kill_count, diff);
 	child->kill_count++;
 	kill_pid(pid);
 
@@ -511,17 +507,6 @@ static void fork_children(void)
 	shm->ready = TRUE;
 }
 
-void log_child_signalled(int childno, pid_t pid, int sig, unsigned long op_nr)
-{
-	struct msg_childsignalled childmsg;
-
-	init_msgchildhdr(&childmsg.hdr, CHILD_SIGNALLED, pid, childno);
-	childmsg.sig = sig;
-	childmsg.op_nr = op_nr;
-
-	sendudp((char *) &childmsg, sizeof(childmsg));
-}
-
 static void handle_childsig(int childno, int childstatus, bool stop)
 {
 	struct childdata *child;
@@ -563,7 +548,6 @@ static void handle_childsig(int childno, int childstatus, bool stop)
 		else {
 			debugf("got a signal from child %d (pid %d) (%s)\n",
 					childno, pid, strsignal(WTERMSIG(childstatus)));
-			log_child_signalled(childno, pid, WTERMSIG(childstatus), child->op_nr);
 		}
 		reap_child(shm->children[childno]);
 		if (child->pidstatfile)
@@ -587,16 +571,6 @@ static void handle_childsig(int childno, int childstatus, bool stop)
 	}
 }
 
-static void log_child_exited(struct childdata *child)
-{
-	struct msg_childexited childmsg;
-
-	init_msgchildhdr(&childmsg.hdr, CHILD_EXITED,
-			 pids[child->num], child->num);
-	childmsg.op_nr = child->op_nr;
-	sendudp((char *) &childmsg, sizeof(childmsg));
-}
-
 static void handle_child(int childno, pid_t childpid, int childstatus)
 {
 	switch (childpid) {
@@ -611,10 +585,8 @@ static void handle_child(int childno, pid_t childpid, int childstatus)
 		if (WIFEXITED(childstatus)) {
 			struct childdata *child = shm->children[childno];
 
-			log_child_exited(child);
-
-			debugf("Child %d (pid:%u type:%u) exited after %ld operations.\n",
-				childno, childpid, child->type, child->op_nr);
+			debugf("Child %d (pid:%u) exited after %ld operations.\n",
+				childno, childpid, child->op_nr);
 			reap_child(shm->children[childno]);
 			if (child->pidstatfile != NULL)
 				fclose(child->pidstatfile);
@@ -733,38 +705,8 @@ static void taint_check(void)
 	}
 }
 
-static void log_main_started(void)
-{
-	struct msg_mainstarted mainmsg;
-
-	if (logging_enabled == FALSE)
-		return;
-
-	init_msghdr(&mainmsg.hdr, MAIN_STARTED);
-	mainmsg.shm_begin = shm;
-	mainmsg.shm_end = shm + shm_size - 1;
-	mainmsg.initial_seed = shm->seed;
-
-	sendudp((char *) &mainmsg, sizeof(mainmsg));
-}
-
-static void log_main_exiting(void)
-{
-	struct msg_mainexiting mainmsg;
-
-	if (logging_enabled == FALSE)
-		return;
-
-	init_msghdr(&mainmsg.hdr, MAIN_EXITING);
-	mainmsg.reason = shm->exit_reason;
-
-	sendudp((char *) &mainmsg, sizeof(mainmsg));
-}
-
 void main_loop(void)
 {
-	log_main_started();
-
 	fork_children();
 
 	while (shm->exit_reason == STILL_RUNNING) {
@@ -834,7 +776,6 @@ corrupt:
 
 dont_wait:
 	output(0, "Bailing main loop because %s.\n", decode_exit(shm->exit_reason));
-	log_main_exiting();
 }
 
 
